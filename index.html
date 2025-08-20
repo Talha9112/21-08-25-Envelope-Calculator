@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envelope Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 1rem;
+            margin: 0;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .left-panel {
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .right-panel {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Tablet responsive styles */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .main-content {
+                gap: 1.5rem;
+            }
+            
+            .controls {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .canvas-container {
+                min-height: 320px;
+            }
+        }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .main-content {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .left-panel {
+                order: 1;
+                width: 100%;
+            }
+            
+            .right-panel {
+                order: 2;
+                width: 100%;
+            }
+            
+            .container {
+                padding: 1rem;
+                margin: 0.5rem;
+                max-width: 100%;
+            }
+            
+            body {
+                padding: 0.5rem;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                margin-bottom: 1rem;
+            }
+            
+            .controls {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1rem !important;
+            }
+            
+            .control-group {
+                width: 100%;
+                padding: 1.2rem;
+            }
+            
+            .info-boxes {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 0.4rem !important;
+                margin: 1.5rem 0;
+            }
+            
+            .info-box {
+                flex: 1;
+                padding: 0.6rem 0.4rem;
+                min-width: 0;
+            }
+            
+            .info-box h3 {
+                font-size: 0.6rem;
+                margin-bottom: 0.3rem;
+                line-height: 1.2;
+            }
+            
+            .info-box .value {
+                font-size: 0.9rem;
+                line-height: 1.1;
+            }
+            
+            .canvas-container {
+                min-height: 350px;
+                padding: 1rem;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            #canvas {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            .unit-toggle-container {
+                margin-bottom: 1.5rem;
+            }
+            
+            .toggle-container {
+                margin-top: 1rem;
+                justify-content: flex-start;
+            }
+            
+            #warningMessage {
+                font-size: 0.95rem;
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+        }
+
+
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .control-group {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        label { 
+            display: block;
+            font-size: 0.95rem; 
+            font-weight: 600;
+            color: #7c646a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        
+        .slider-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .slider-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 10px;
+            color: #888;
+        }
+        
+        input[type="range"] { 
+            width: 100%; 
+            height: 6px;
+            background: #dee2e6;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            margin: 0.5rem 0;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #17a2b8;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #17a2b8;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .value-display { 
+            font-family: 'Courier New', monospace;
+            color: #17a2b8;
+            font-weight: bold;
+            font-size: 1rem;
+            float: right;
+        }
+        
+        .info-boxes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .info-box {
+            background: #f7b0aa;
+            color: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .info-box h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-box .value {
+            color: #7c646a;
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .toggle-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .toggle-container label {
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .canvas-container {
+            background: transparent;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        
+        #canvas {
+            border-radius: 8px;
+        }
+        
+        .legend {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .legend span {
+            white-space: nowrap;
+        }
+
+        .unit-toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .unit-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .unit-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .unit-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .unit-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .unit-slider {
+            background-color: #17a2b8;
+        }
+
+        input:checked + .unit-slider:before {
+            transform: translateX(26px);
+        }
+
+        .unit-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 1rem;
+        }
+
+        .unit-label.active {
+            color: #17a2b8;
+        }
+
+        #warningMessage {
+            display: none;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            color: #856404;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #warningMessage.approaching {
+            background: #fff8e1;
+            border-color: #ffb74d;
+            color: #e65100;
+        }
+        
+        #warningMessage.exceeded {
+            background: #ffebee;
+            border-color: #ef5350;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span style="color:#f7b0aa">ENVELOPE</span> <span style="color: #7c646a !important;">CALCULATOR </span></h1>
+        
+        <!-- Unit Toggle -->
+        <div class="unit-toggle-container">
+            <span class="unit-label active" id="inchesLabel">Inches</span>
+            <label class="unit-toggle">
+                <input type="checkbox" id="unitToggle">
+                <span class="unit-slider"></span>
+            </label>
+            <span class="unit-label" id="cmLabel">Centimeters</span>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="width">Width: <span id="widthValue" class="value-display">4"</span></label>
+                        <input type="range" id="width" min="1" max="64" value="32">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="height">Height: <span id="heightValue" class="value-display">3"</span></label>
+                        <input type="range" id="height" min="1" max="64" value="24">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="offset">Padding: <span id="offsetValue" class="value-display">0"</span></label>
+                        <input type="range" id="offset" min="0" max="4" value="0">
+                    </div>
+                </div>
+                
+                <div class="info-boxes">
+                    <div class="info-box">
+                        <h3>Paper Size</h3>
+                        <div class="value" id="paperSize">0"</div>
+                    </div>
+                    <div class="info-box">
+                        <h3>Start Number</h3>
+                        <div class="value" id="alignmentNumber">0</div>
+                    </div>
+                    <div class="info-box">
+                        <h3>Liner Size</h3>
+                        <div class="value" id="linerSize">0"</div>
+                    </div>
+                </div>
+                
+                <div id="warningMessage"></div>
+                
+                <div class="toggle-container">
+                    <input type="checkbox" id="showMeasurements">
+                    <label for="showMeasurements">Show Alignment Measurements</label>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+                <div class="legend">
+                    <span><span style="color: #2DA9BC;">■</span> Card Area</span>
+                    <span><span style="color: #f0ebe1;">■</span> Paper Boundary</span>
+                    <span><span style="color: #A08C8C;">- -</span> Padding Zone</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const widthSlider = document.getElementById('width');
+        const heightSlider = document.getElementById('height');
+        const offsetSlider = document.getElementById('offset');
+        const showMeasurements = document.getElementById('showMeasurements');
+        const widthValue = document.getElementById('widthValue');
+        const heightValue = document.getElementById('heightValue');
+        const offsetValue = document.getElementById('offsetValue');
+        const paperSize = document.getElementById('paperSize');
+        const alignmentNumber = document.getElementById('alignmentNumber');
+        const linerSize = document.getElementById('linerSize');
+        const unitToggle = document.getElementById('unitToggle');
+        const inchesLabel = document.getElementById('inchesLabel');
+        const cmLabel = document.getElementById('cmLabel');
+        
+        let isMetric = false; // Track current unit system
+        
+        // Convert slider value to inches (1-64 represents 1/8" to 8")
+        function sliderToInches(value) {
+            return value / 8;
+        }
+
+        // Unit conversion functions
+        function inchesToCm(inches) {
+            return inches * 2.54;
+        }
+
+        function cmToInches(cm) {
+            return cm / 2.54;
+        }
+
+        function formatCm(val) {
+            const cm = val * 2.54; // Convert inches to cm
+            return Math.round(cm * 10) / 10 + ' cm'; // Round to 1 decimal place
+        }
+        
+        // Format inches for display
+        function formatInches(inches) {
+            // Round up to nearest 1/8"
+            const roundedInches = Math.ceil(inches * 8) / 8;
+            
+            const whole = Math.floor(roundedInches);
+            const fraction = roundedInches - whole;
+            
+            if (fraction === 0) {
+                return `${whole}"`;
+            }
+            
+            const fractions = {
+                0.125: '⅛',
+                0.25: '¼',
+                0.375: '⅜',
+                0.5: '½',
+                0.625: '⅝',
+                0.75: '¾',
+                0.875: '⅞'
+            };
+            
+            if (whole === 0) {
+                return `${fractions[fraction]}"`;
+            }
+            
+            return `${whole} ${fractions[fraction]}"`;
+        }
+
+        // Format value based on current unit system
+        function formatValue(val) {
+            return isMetric ? formatCm(val) : formatInches(val);
+        }
+
+        // Toggle between units
+        function toggleUnits() {
+            isMetric = !isMetric;
+            
+            // Update label styling
+            if (isMetric) {
+                inchesLabel.classList.remove('active');
+                cmLabel.classList.add('active');
+            } else {
+                cmLabel.classList.remove('active');
+                inchesLabel.classList.add('active');
+            }
+
+            // Redraw with new units
+            drawRectangle();
+        }
+        
+
+
+        function drawRectangle() {
+            const widthInches = sliderToInches(widthSlider.value);
+            const heightInches = sliderToInches(heightSlider.value);
+            const offsetInches = sliderToInches(offsetSlider.value);
+            
+            // Update value displays using new format function
+            widthValue.textContent = formatValue(widthInches);
+            heightValue.textContent = formatValue(heightInches);
+            offsetValue.textContent = formatValue(offsetInches);
+            
+            // Scale factor: 30 pixels per inch for display (slightly smaller)
+            const scale = 30;
+            const rectWidth = widthInches * scale;
+            const rectHeight = heightInches * scale;
+            
+            // Extension length (5/8" = 0.625 inches) and offset
+            const extensionLength = 0.625 * scale; // 5/8" in pixels
+            const offsetPixels = offsetInches * scale;
+            
+            // Calculate total size needed including extensions and diamond
+            // Calculate the maximum extent of the diamond
+            // The diamond extends beyond the rectangle + offset + extensions
+            const totalWidth = rectWidth + 2 * (offsetPixels + extensionLength);
+            const totalHeight = rectHeight + 2 * (offsetPixels + extensionLength);
+            
+            // For a square diamond, the diagonal is the max of width/height
+            const maxDimension = Math.max(totalWidth, totalHeight);
+            // The diamond extends sqrt(2) times the half-dimension from center
+            const diamondExtent = maxDimension * Math.sqrt(2) / 2;
+            
+            // Set canvas size to accommodate the entire diamond with padding (responsive)
+            const padding = window.innerWidth <= 768 ? 60 : 80;
+            const requiredSize = diamondExtent * 2 + padding;
+            
+            // Mobile-first responsive canvas sizing (bigger mobile)
+            let canvasSize;
+            if (window.innerWidth <= 480) {
+                // Small mobile phones - much bigger
+                canvasSize = Math.min(Math.max(requiredSize, 350), 450);
+            } else if (window.innerWidth <= 768) {
+                // Larger mobile phones and small tablets - bigger
+                canvasSize = Math.min(Math.max(requiredSize, 450), 550);
+            } else {
+                // Desktop and larger screens
+                canvasSize = Math.min(Math.max(requiredSize, 700), 900);
+            }
+            
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+            
+            // Clear canvas with white background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Calculate center position
+            const x = (canvas.width - rectWidth) / 2;
+            const y = (canvas.height - rectHeight) / 2;
+            
+            // Remove shadow for cleaner look
+            
+            // We'll draw the turquoise card later, after the diamond
+            
+            // Draw corner extension lines (but make them invisible - we only need them for calculations)
+            ctx.strokeStyle = 'rgba(0,0,0,0)';
+            ctx.lineWidth = 0;
+            
+            // Store corner points for later use
+            const corners = {
+                topLeft: {
+                    corner: { x: x - offsetPixels, y: y - offsetPixels },
+                    vertical: { x: x - offsetPixels, y: y - offsetPixels - extensionLength },
+                    horizontal: { x: x - offsetPixels - extensionLength, y: y - offsetPixels }
+                },
+                topRight: {
+                    corner: { x: x + rectWidth + offsetPixels, y: y - offsetPixels },
+                    vertical: { x: x + rectWidth + offsetPixels, y: y - offsetPixels - extensionLength },
+                    horizontal: { x: x + rectWidth + offsetPixels + extensionLength, y: y - offsetPixels }
+                },
+                bottomLeft: {
+                    corner: { x: x - offsetPixels, y: y + rectHeight + offsetPixels },
+                    vertical: { x: x - offsetPixels, y: y + rectHeight + offsetPixels + extensionLength },
+                    horizontal: { x: x - offsetPixels - extensionLength, y: y + rectHeight + offsetPixels }
+                },
+                bottomRight: {
+                    corner: { x: x + rectWidth + offsetPixels, y: y + rectHeight + offsetPixels },
+                    vertical: { x: x + rectWidth + offsetPixels, y: y + rectHeight + offsetPixels + extensionLength },
+                    horizontal: { x: x + rectWidth + offsetPixels + extensionLength, y: y + rectHeight + offsetPixels }
+                }
+            };
+            
+            // Draw corner L-shapes
+            // Top-left
+            ctx.beginPath();
+            ctx.moveTo(corners.topLeft.corner.x, corners.topLeft.corner.y);
+            ctx.lineTo(corners.topLeft.vertical.x, corners.topLeft.vertical.y);
+            ctx.moveTo(corners.topLeft.corner.x, corners.topLeft.corner.y);
+            ctx.lineTo(corners.topLeft.horizontal.x, corners.topLeft.horizontal.y);
+            ctx.stroke();
+            
+            // Top-right
+            ctx.beginPath();
+            ctx.moveTo(corners.topRight.corner.x, corners.topRight.corner.y);
+            ctx.lineTo(corners.topRight.vertical.x, corners.topRight.vertical.y);
+            ctx.moveTo(corners.topRight.corner.x, corners.topRight.corner.y);
+            ctx.lineTo(corners.topRight.horizontal.x, corners.topRight.horizontal.y);
+            ctx.stroke();
+            
+            // Bottom-left
+            ctx.beginPath();
+            ctx.moveTo(corners.bottomLeft.corner.x, corners.bottomLeft.corner.y);
+            ctx.lineTo(corners.bottomLeft.vertical.x, corners.bottomLeft.vertical.y);
+            ctx.moveTo(corners.bottomLeft.corner.x, corners.bottomLeft.corner.y);
+            ctx.lineTo(corners.bottomLeft.horizontal.x, corners.bottomLeft.horizontal.y);
+            ctx.stroke();
+            
+            // Bottom-right
+            ctx.beginPath();
+            ctx.moveTo(corners.bottomRight.corner.x, corners.bottomRight.corner.y);
+            ctx.lineTo(corners.bottomRight.vertical.x, corners.bottomRight.vertical.y);
+            ctx.moveTo(corners.bottomRight.corner.x, corners.bottomRight.corner.y);
+            ctx.lineTo(corners.bottomRight.horizontal.x, corners.bottomRight.horizontal.y);
+            ctx.stroke();
+            
+            // Hide 45-degree lines for cleaner look
+            ctx.strokeStyle = 'rgba(0,0,0,0)';
+            ctx.lineWidth = 0;
+            
+            // Top-left diagonal
+            ctx.beginPath();
+            ctx.moveTo(corners.topLeft.vertical.x, corners.topLeft.vertical.y);
+            ctx.lineTo(corners.topLeft.horizontal.x, corners.topLeft.horizontal.y);
+            ctx.stroke();
+            
+            // Top-right diagonal
+            ctx.beginPath();
+            ctx.moveTo(corners.topRight.vertical.x, corners.topRight.vertical.y);
+            ctx.lineTo(corners.topRight.horizontal.x, corners.topRight.horizontal.y);
+            ctx.stroke();
+            
+            // Bottom-left diagonal
+            ctx.beginPath();
+            ctx.moveTo(corners.bottomLeft.vertical.x, corners.bottomLeft.vertical.y);
+            ctx.lineTo(corners.bottomLeft.horizontal.x, corners.bottomLeft.horizontal.y);
+            ctx.stroke();
+            
+            // Bottom-right diagonal
+            ctx.beginPath();
+            ctx.moveTo(corners.bottomRight.vertical.x, corners.bottomRight.vertical.y);
+            ctx.lineTo(corners.bottomRight.horizontal.x, corners.bottomRight.horizontal.y);
+            ctx.stroke();
+            
+            // Function to find intersection of two lines defined by two points each
+            function lineIntersection(p1, p2, p3, p4) {
+                const x1 = p1.x, y1 = p1.y;
+                const x2 = p2.x, y2 = p2.y;
+                const x3 = p3.x, y3 = p3.y;
+                const x4 = p4.x, y4 = p4.y;
+                
+                const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+                if (Math.abs(denom) < 0.001) return null; // Lines are parallel
+                
+                const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+                
+                return {
+                    x: x1 + t * (x2 - x1),
+                    y: y1 + t * (y2 - y1)
+                };
+            }
+            
+            // Calculate intersection points for the diamond
+            // Top vertex: intersection of top-left and top-right diagonals
+            const topVertex = lineIntersection(
+                corners.topLeft.vertical, corners.topLeft.horizontal,
+                corners.topRight.vertical, corners.topRight.horizontal
+            );
+            
+            // Right vertex: intersection of top-right and bottom-right diagonals
+            const rightVertex = lineIntersection(
+                corners.topRight.vertical, corners.topRight.horizontal,
+                corners.bottomRight.vertical, corners.bottomRight.horizontal
+            );
+            
+            // Bottom vertex: intersection of bottom-left and bottom-right diagonals
+            const bottomVertex = lineIntersection(
+                corners.bottomLeft.vertical, corners.bottomLeft.horizontal,
+                corners.bottomRight.vertical, corners.bottomRight.horizontal
+            );
+            
+            // Left vertex: intersection of top-left and bottom-left diagonals
+            const leftVertex = lineIntersection(
+                corners.topLeft.vertical, corners.topLeft.horizontal,
+                corners.bottomLeft.vertical, corners.bottomLeft.horizontal
+            );
+            
+            // Draw the diamond with light beige fill and no outline
+            if (topVertex && rightVertex && bottomVertex && leftVertex) {
+                ctx.fillStyle = '#f0ebe1';
+                ctx.beginPath();
+                ctx.moveTo(topVertex.x, topVertex.y);
+                ctx.lineTo(rightVertex.x, rightVertex.y);
+                ctx.lineTo(bottomVertex.x, bottomVertex.y);
+                ctx.lineTo(leftVertex.x, leftVertex.y);
+                ctx.closePath();
+                ctx.fill();
+                
+                            // Draw the turquoise card at fixed position (not affected by padding)
+            ctx.fillStyle = '#2DA9BC';
+            ctx.fillRect(x, y, rectWidth, rectHeight);
+                
+                // Calculate pink line positions but don't draw them - only calculate for measurement
+                // Calculate offset distance (permanently 1/2" in pixels)
+                const pinkOffset = 0.5 * scale; // 1/2" converted to pixels
+                
+                // Calculate offset vertices (move each vertex toward center)
+                const topOffsetVertex = {
+                    x: topVertex.x,
+                    y: topVertex.y + pinkOffset
+                };
+                const rightOffsetVertex = {
+                    x: rightVertex.x - pinkOffset,
+                    y: rightVertex.y
+                };
+                const leftOffsetVertex = {
+                    x: leftVertex.x + pinkOffset,
+                    y: leftVertex.y
+                };
+                
+                // Top horizontal dashed line position
+                const topDashedY = y - offsetPixels;
+                
+                // Function to find intersection of a line segment with horizontal line
+                function findIntersectionWithHorizontal(p1, p2, yLine) {
+                    // If line is horizontal, no intersection
+                    if (Math.abs(p2.y - p1.y) < 0.001) return null;
+                    
+                    // Check if yLine is between the two points
+                    if (yLine < Math.min(p1.y, p2.y) || yLine > Math.max(p1.y, p2.y)) return null;
+                    
+                    // Calculate intersection point
+                    const t = (yLine - p1.y) / (p2.y - p1.y);
+                    const xIntersect = p1.x + t * (p2.x - p1.x);
+                    
+                    return { x: xIntersect, y: yLine };
+                }
+                
+                // Find where the top-left pink line intersects with top dashed line
+                const leftIntersection = findIntersectionWithHorizontal(topOffsetVertex, leftOffsetVertex, topDashedY);
+                
+                // Find where the top-right pink line intersects with top dashed line
+                const rightIntersection = findIntersectionWithHorizontal(topOffsetVertex, rightOffsetVertex, topDashedY);
+                
+                // Calculate intersection points but don't draw the lines
+                let pinkLineLength = 0;
+                if (leftIntersection) {
+                    // Calculate the length of the pink line
+                    pinkLineLength = Math.sqrt(
+                        Math.pow(leftIntersection.x - topOffsetVertex.x, 2) + 
+                        Math.pow(leftIntersection.y - topOffsetVertex.y, 2)
+                    );
+                } else {
+                    // Calculate the full length
+                    pinkLineLength = Math.sqrt(
+                        Math.pow(leftOffsetVertex.x - topOffsetVertex.x, 2) + 
+                        Math.pow(leftOffsetVertex.y - topOffsetVertex.y, 2)
+                    );
+                }
+                
+                // Convert pink line length to inches and update display
+                const pinkLineLengthInches = pinkLineLength / scale;
+                linerSize.textContent = formatValue(pinkLineLengthInches);
+                
+                // Calculate the length of one side of the diamond (all sides are equal since it's a square)
+                const sideLength = Math.sqrt(
+                    Math.pow(rightVertex.x - topVertex.x, 2) + 
+                    Math.pow(rightVertex.y - topVertex.y, 2)
+                );
+                
+                // Convert pixels back to inches
+                const sideLengthInches = sideLength / scale;
+                
+                // Update paper size display with the purple line length
+                paperSize.textContent = formatValue(sideLengthInches);
+                
+                // Calculate Alignment Number
+                // Function to find line-segment intersection
+                function lineSegmentIntersection(lineType, lineValue, p1, p2) {
+                    // lineType: 'horizontal' or 'vertical'
+                    // lineValue: y-value for horizontal, x-value for vertical
+                    // p1, p2: endpoints of diamond edge segment
+                    
+                    if (lineType === 'horizontal') {
+                        // Line is y = lineValue
+                        const y = lineValue;
+                        
+                        // Check if line crosses the segment's y-range
+                        if ((y < Math.min(p1.y, p2.y)) || (y > Math.max(p1.y, p2.y))) {
+                            return null;
+                        }
+                        
+                        // If segment is also horizontal (parallel)
+                        if (Math.abs(p2.y - p1.y) < 0.001) {
+                            return null;
+                        }
+                        
+                        // Find x where segment crosses y = lineValue
+                        const t = (y - p1.y) / (p2.y - p1.y);
+                        const x = p1.x + t * (p2.x - p1.x);
+                        
+                        return { x: x, y: y };
+                    } else {
+                        // Line is x = lineValue
+                        const x = lineValue;
+                        
+                        // Check if line crosses the segment's x-range
+                        if ((x < Math.min(p1.x, p2.x)) || (x > Math.max(p1.x, p2.x))) {
+                            return null;
+                        }
+                        
+                        // If segment is also vertical (parallel)
+                        if (Math.abs(p2.x - p1.x) < 0.001) {
+                            return null;
+                        }
+                        
+                        // Find y where segment crosses x = lineValue
+                        const t = (x - p1.x) / (p2.x - p1.x);
+                        const y = p1.y + t * (p2.y - p1.y);
+                        
+                        return { x: x, y: y };
+                    }
+                }
+                
+                // Function to calculate chord length for a dashed line
+                function calculateChordLength(lineType, lineValue, diamondVertices) {
+                    const intersections = [];
+                    
+                    // Check intersection with each diamond edge
+                    for (let i = 0; i < 4; i++) {
+                        const p1 = diamondVertices[i];
+                        const p2 = diamondVertices[(i + 1) % 4];
+                        
+                        const intersection = lineSegmentIntersection(lineType, lineValue, p1, p2);
+                        if (intersection) {
+                            // Check if this point is already in our list (deduplication)
+                            const isDuplicate = intersections.some(pt => 
+                                Math.abs(pt.x - intersection.x) < 0.001 && 
+                                Math.abs(pt.y - intersection.y) < 0.001
+                            );
+                            
+                            if (!isDuplicate) {
+                                intersections.push(intersection);
+                            }
+                        }
+                    }
+                    
+                    // If we have at least 2 intersections, calculate the chord length
+                    if (intersections.length >= 2) {
+                        // Sort and find the two farthest points
+                        if (lineType === 'horizontal') {
+                            intersections.sort((a, b) => a.x - b.x);
+                        } else {
+                            intersections.sort((a, b) => a.y - b.y);
+                        }
+                        
+                        const p1 = intersections[0];
+                        const p2 = intersections[intersections.length - 1];
+                        
+                        // Calculate distance
+                        const distance = Math.sqrt(
+                            Math.pow(p2.x - p1.x, 2) + 
+                            Math.pow(p2.y - p1.y, 2)
+                        );
+                        
+                        return distance;
+                    }
+                    
+                    return 0;
+                }
+                
+                // Define dashed line positions (they connect the corner constructions)
+                // The dashed lines are at the offset distance from the rectangle
+                const dashedTop = y - offsetPixels;
+                const dashedBottom = y + rectHeight + offsetPixels;
+                const dashedLeft = x - offsetPixels;
+                const dashedRight = x + rectWidth + offsetPixels;
+                
+                // Define diamond vertices
+                const diamondVertices = [
+                    topVertex,
+                    rightVertex,
+                    bottomVertex,
+                    leftVertex
+                ];
+                
+                // Calculate chord lengths for each dashed line
+                const chordTop = calculateChordLength('horizontal', dashedTop, diamondVertices);
+                const chordBottom = calculateChordLength('horizontal', dashedBottom, diamondVertices);
+                const chordLeft = calculateChordLength('vertical', dashedLeft, diamondVertices);
+                const chordRight = calculateChordLength('vertical', dashedRight, diamondVertices);
+                
+                // Convert to inches (scale is pixels per inch)
+                const chordTopInches = chordTop / scale;
+                const chordBottomInches = chordBottom / scale;
+                const chordLeftInches = chordLeft / scale;
+                const chordRightInches = chordRight / scale;
+                
+                // Calculate alignment units for each edge
+                const baseline = 2.5; // baseline in inches
+                const uTop = Math.max(0, Math.min(60, Math.round((chordTopInches - baseline) * 8)));
+                const uBottom = Math.max(0, Math.min(60, Math.round((chordBottomInches - baseline) * 8)));
+                const uLeft = Math.max(0, Math.min(60, Math.round((chordLeftInches - baseline) * 8)));
+                const uRight = Math.max(0, Math.min(60, Math.round((chordRightInches - baseline) * 8)));
+                
+                // The Alignment Number is the maximum
+                const alignmentNum = Math.max(uTop, uBottom, uLeft, uRight);
+                
+                            // Update the display
+            alignmentNumber.textContent = alignmentNum;
+            
+            // Warning logic - calculate paper size limit
+            const wp = widthInches + offsetInches;
+            const hp = heightInches + offsetInches;
+            const dotted = (wp + hp) / Math.SQRT2;
+            const outer = dotted + 1;
+            
+            const warningDiv = document.getElementById('warningMessage');
+            let warningMsg = '';
+            let warningClass = '';
+            
+            // Check if paper size reaches or exceeds exactly 12 inches
+            if (outer >= 12.0) { // Show warning only when reaching exactly 12 inches
+                const limitText = isMetric ? '30.5 cm' : '12"';
+                warningMsg += `🚨 WARNING: Your paper size has reached the ${limitText} limit!<br>`;
+                warningClass = 'exceeded';
+            }
+            
+            // Check for very small envelopes
+            if (widthInches < 2 || heightInches < 2) {
+                warningMsg += `ℹ️ Very small envelopes may be hard to fold. Consider increasing card size or padding.`;
+            }
+            
+            // Display warning message
+            warningDiv.innerHTML = warningMsg;
+            warningDiv.style.display = warningMsg ? 'block' : 'none';
+            warningDiv.className = warningClass;
+            }
+            
+            // Draw dashed lines extended to diamond edges
+            ctx.strokeStyle = '#A08C8C';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 4]);
+            
+            // Draw dashed lines that move outward from card edges based on padding
+            if (topVertex && rightVertex && bottomVertex && leftVertex) {
+                // Function to find intersections with diamond edges
+                function findHorizontalIntersections(lineY, diamondVertices) {
+                    const intersections = [];
+                    for (let i = 0; i < 4; i++) {
+                        const p1 = diamondVertices[i];
+                        const p2 = diamondVertices[(i + 1) % 4];
+                        
+                        if ((lineY >= Math.min(p1.y, p2.y)) && (lineY <= Math.max(p1.y, p2.y)) && Math.abs(p2.y - p1.y) > 0.001) {
+                            const t = (lineY - p1.y) / (p2.y - p1.y);
+                            const intersectionX = p1.x + t * (p2.x - p1.x);
+                            intersections.push({ x: intersectionX, y: lineY });
+                        }
+                    }
+                    return intersections.sort((a, b) => a.x - b.x);
+                }
+                
+                function findVerticalIntersections(lineX, diamondVertices) {
+                    const intersections = [];
+                    for (let i = 0; i < 4; i++) {
+                        const p1 = diamondVertices[i];
+                        const p2 = diamondVertices[(i + 1) % 4];
+                        
+                        if ((lineX >= Math.min(p1.x, p2.x)) && (lineX <= Math.max(p1.x, p2.x)) && Math.abs(p2.x - p1.x) > 0.001) {
+                            const t = (lineX - p1.x) / (p2.x - p1.x);
+                            const intersectionY = p1.y + t * (p2.y - p1.y);
+                            intersections.push({ x: lineX, y: intersectionY });
+                        }
+                    }
+                    return intersections.sort((a, b) => a.y - b.y);
+                }
+                
+                const diamondVertices = [topVertex, rightVertex, bottomVertex, leftVertex];
+                
+                // Dashed lines positioned at card edges + padding offset
+                // As padding increases, these lines move outward from the card
+                
+                // Top horizontal dashed line - moves up from card top edge by padding amount
+                const topLineY = y - offsetPixels;
+                const topIntersections = findHorizontalIntersections(topLineY, diamondVertices);
+                if (topIntersections.length >= 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(topIntersections[0].x, topLineY);
+                    ctx.lineTo(topIntersections[topIntersections.length - 1].x, topLineY);
+                    ctx.stroke();
+                }
+                
+                // Bottom horizontal dashed line - moves down from card bottom edge by padding amount
+                const bottomLineY = y + rectHeight + offsetPixels;
+                const bottomIntersections = findHorizontalIntersections(bottomLineY, diamondVertices);
+                if (bottomIntersections.length >= 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(bottomIntersections[0].x, bottomLineY);
+                    ctx.lineTo(bottomIntersections[bottomIntersections.length - 1].x, bottomLineY);
+                    ctx.stroke();
+                }
+                
+                // Left vertical dashed line - moves left from card left edge by padding amount
+                const leftLineX = x - offsetPixels;
+                const leftIntersections = findVerticalIntersections(leftLineX, diamondVertices);
+                if (leftIntersections.length >= 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(leftLineX, leftIntersections[0].y);
+                    ctx.lineTo(leftLineX, leftIntersections[leftIntersections.length - 1].y);
+                    ctx.stroke();
+                }
+                
+                // Right vertical dashed line - moves right from card right edge by padding amount
+                const rightLineX = x + rectWidth + offsetPixels;
+                const rightIntersections = findVerticalIntersections(rightLineX, diamondVertices);
+                if (rightIntersections.length >= 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(rightLineX, rightIntersections[0].y);
+                    ctx.lineTo(rightLineX, rightIntersections[rightIntersections.length - 1].y);
+                    ctx.stroke();
+                }
+            }
+            
+            // Reset line dash
+            ctx.setLineDash([]);
+            
+            // Draw width and height dimension labels on canvas
+            ctx.fillStyle = '#6A6E72';
+            ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Width number at top of canvas, close to the card
+            const widthText = formatValue(widthInches);
+            ctx.fillText(widthText, canvas.width / 2, y - offsetPixels - 25);
+            
+            // Height number on left side, horizontal orientation
+            const heightText = formatValue(heightInches);
+            ctx.fillText(heightText, x - offsetPixels - 20, canvas.height / 2);
+            
+            // Draw alignment number labels for each dotted line (only if checkbox is checked)
+            if (topVertex && rightVertex && bottomVertex && leftVertex && showMeasurements.checked) {
+                // Same calculation logic as below for the alignment numbers
+                const diamondVertices = [topVertex, rightVertex, bottomVertex, leftVertex];
+                const baseline = 2.5;
+                
+                // Helper function for line-segment intersection (local copy)
+                function getIntersections(lineType, lineValue, vertices) {
+                    const intersections = [];
+                    for (let i = 0; i < 4; i++) {
+                        const p1 = vertices[i];
+                        const p2 = vertices[(i + 1) % 4];
+                        
+                        let intersection = null;
+                        if (lineType === 'horizontal') {
+                            const y = lineValue;
+                            if ((y >= Math.min(p1.y, p2.y)) && (y <= Math.max(p1.y, p2.y)) && Math.abs(p2.y - p1.y) > 0.001) {
+                                const t = (y - p1.y) / (p2.y - p1.y);
+                                intersection = { x: p1.x + t * (p2.x - p1.x), y: y };
+                            }
+                        } else {
+                            const x = lineValue;
+                            if ((x >= Math.min(p1.x, p2.x)) && (x <= Math.max(p1.x, p2.x)) && Math.abs(p2.x - p1.x) > 0.001) {
+                                const t = (x - p1.x) / (p2.x - p1.x);
+                                intersection = { x: x, y: p1.y + t * (p2.y - p1.y) };
+                            }
+                        }
+                        
+                        if (intersection) {
+                            const isDuplicate = intersections.some(pt => 
+                                Math.abs(pt.x - intersection.x) < 0.001 && 
+                                Math.abs(pt.y - intersection.y) < 0.001
+                            );
+                            if (!isDuplicate) intersections.push(intersection);
+                        }
+                    }
+                    
+                    if (intersections.length >= 2) {
+                        if (lineType === 'horizontal') {
+                            intersections.sort((a, b) => a.x - b.x);
+                        } else {
+                            intersections.sort((a, b) => a.y - b.y);
+                        }
+                        const distance = Math.sqrt(
+                            Math.pow(intersections[intersections.length - 1].x - intersections[0].x, 2) + 
+                            Math.pow(intersections[intersections.length - 1].y - intersections[0].y, 2)
+                        );
+                        return distance / scale; // Convert to inches
+                    }
+                    return 0;
+                }
+                
+                // Calculate individual alignment numbers
+                const topChord = getIntersections('horizontal', y - offsetPixels, diamondVertices);
+                const bottomChord = getIntersections('horizontal', y + rectHeight + offsetPixels, diamondVertices);
+                const leftChord = getIntersections('vertical', x - offsetPixels, diamondVertices);
+                const rightChord = getIntersections('vertical', x + rectWidth + offsetPixels, diamondVertices);
+                
+                const uTop = Math.max(0, Math.min(60, Math.round((topChord - baseline) * 8)));
+                const uBottom = Math.max(0, Math.min(60, Math.round((bottomChord - baseline) * 8)));
+                const uLeft = Math.max(0, Math.min(60, Math.round((leftChord - baseline) * 8)));
+                const uRight = Math.max(0, Math.min(60, Math.round((rightChord - baseline) * 8)));
+                
+                // Draw labels
+                ctx.fillStyle = '#8b5cf6';
+                ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                
+                // Top line label
+                ctx.fillText(uTop.toString(), x + rectWidth / 2, y - offsetPixels - 5);
+                
+                // Bottom line label
+                ctx.textBaseline = 'top';
+                ctx.fillText(uBottom.toString(), x + rectWidth / 2, y + rectHeight + offsetPixels + 5);
+                
+                // Left line label
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(uLeft.toString(), x - offsetPixels - 5, y + rectHeight / 2);
+                
+                // Right line label
+                ctx.textAlign = 'left';
+                ctx.fillText(uRight.toString(), x + rectWidth + offsetPixels + 5, y + rectHeight / 2);
+            }
+        }
+        
+        // Event listeners
+        widthSlider.addEventListener('input', drawRectangle);
+        heightSlider.addEventListener('input', drawRectangle);
+        offsetSlider.addEventListener('input', drawRectangle);
+        showMeasurements.addEventListener('change', drawRectangle);
+        unitToggle.addEventListener('change', toggleUnits);
+        
+        // Initial draw
+        drawRectangle();
+    </script>
+</body>
+</html>
