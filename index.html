@@ -84,7 +84,7 @@
             }
             
             h1 {
-                font-size: 0.6rem;
+                font-size: 0.8rem;
                 margin-bottom: 0;
                 text-align: left;
                 display: inline-block;
@@ -196,7 +196,7 @@
             }
             
             .value-display {
-                font-size: 0.8rem;
+                font-size: 1.2rem;
                 float: right;
                 color: #0056b3;
                 font-weight: 800;
@@ -330,7 +330,7 @@
         
         .control-group {
             background: #f8f9fa;
-            padding: 1.25rem;
+            padding: 0.5rem;
             border-radius: 12px;
             border-left: 4px solid #17a2b8;
         }
@@ -400,7 +400,7 @@
             font-family: 'Proxima Nova', 'Courier New', monospace;
             color: #17a2b8;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.3rem;
             float: right;
         }
         
@@ -413,8 +413,8 @@
         .info-box {
             background: #f7b0aa;
             color: white;
-            padding: 1.25rem;
-            border-radius: 12px;
+            padding: 0.5rem;
+            border-radius: 10px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
@@ -452,7 +452,7 @@
             align-items: center;
             min-height: 350px;
             position: relative;
-            margin-top: 0.5rem;
+            margin-top: -2.5rem;
         }
         
         #canvas {
@@ -460,7 +460,7 @@
         }
         
         .legend {
-            margin-top: 1rem;
+            margin-top: -2rem;
             font-size: 0.85rem;
             color: #6c757d;
             display: flex;
@@ -623,7 +623,7 @@
                         <div class="value" id="alignmentNumber">0</div>
                     </div>
                     <div class="info-box">
-                        <h3>Liner Size (Optional)</h3>
+                        <h3>Liner Size</h3>
                         <div class="value" id="linerSize">0"</div>
                     </div>
                 </div>
@@ -686,7 +686,7 @@
         function formatDimension(inches) {
             if (isMetric) {
                 const cm = inches * 2.54;
-                return Math.round(cm * 10) / 10 + ' cm';
+                return Math.round(cm * 100) / 100 + ' cm'; // Round to 2 decimal places for better accuracy
             } else {
                 return formatInches(inches);
             }
@@ -753,10 +753,7 @@
                 offsetScales[3].textContent = '1cm';
                 offsetScales[4].textContent = '1.3cm';
                 
-                // Update mobile label
-                if (window.innerWidth <= 768) {
-                    document.getElementById('inchesLabel').textContent = 'cm';
-                }
+                // Don't change labels - keep original "Inches" and "cm" text
             } else {
                 // Reset to inches
                 widthScales[0].textContent = '⅛"';
@@ -777,10 +774,7 @@
                 offsetScales[3].textContent = '⅜"';
                 offsetScales[4].textContent = '½"';
                 
-                // Update mobile label
-                if (window.innerWidth <= 768) {
-                    document.getElementById('inchesLabel').textContent = 'in';
-                }
+                // Don't change labels - keep original "Inches" and "cm" text
             }
         }
         
@@ -1319,7 +1313,7 @@
             ctx.fillStyle = '#6A6E72';
             
             // Responsive font size for mobile
-            const fontSize = window.innerWidth <= 768 ? 14 : 16;
+            const fontSize = window.innerWidth <= 768 ? 18 : 22;
             ctx.font = `bold ${fontSize}px "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
             ctx.fillStyle = '#2c3e50';
             ctx.textAlign = 'center';
@@ -1332,7 +1326,7 @@
             
             // Height number on left side - optimal positioning
             const heightText = formatValue(heightInches);
-            const heightXPos = window.innerWidth <= 768 ? x - offsetPixels - 25 : x - offsetPixels - 30;
+            const heightXPos = window.innerWidth <= 768 ? x - offsetPixels - 30 : x - offsetPixels - 45;
             ctx.fillText(heightText, heightXPos, canvas.height / 2);
             
             // Draw alignment number labels for each dotted line (disabled)
