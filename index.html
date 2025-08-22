@@ -11,6 +11,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Nunito', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         }
         
         body { 
@@ -200,6 +201,7 @@
                 float: right;
                 color: #0056b3;
                 font-weight: 800;
+                font-family: 'Nunito', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             }
             
             input[type="range"] {
@@ -263,6 +265,7 @@
                 line-height: 0.9;
                 font-weight: 800;
                 color: #2c3e50;
+                font-family: 'Nunito', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             }
             
             .canvas-container {
@@ -397,7 +400,7 @@
         }
         
         .value-display { 
-            font-family: 'Proxima Nova', 'Courier New', monospace;
+            font-family: 'Nunito', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             color: #17a2b8;
             font-weight: bold;
             font-size: 1.3rem;
@@ -407,7 +410,7 @@
         .info-boxes {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+            gap: 0rem;
         }
         
         .info-box {
@@ -431,7 +434,7 @@
             color: #7c646a;
             font-size: 1.2rem;
             font-weight: bold;
-            font-family: 'Proxima Nova', 'Courier New', monospace;
+            font-family: 'Nunito', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         }
         
         .toggle-container {
@@ -619,7 +622,7 @@
                         <div class="value" id="paperSize">0"</div>
                     </div>
                     <div class="info-box">
-                        <h3>Start Number</h3>
+                        <h3>Start #</h3>
                         <div class="value" id="alignmentNumber">0</div>
                     </div>
                     <div class="info-box">
@@ -686,7 +689,8 @@
         function formatDimension(inches) {
             if (isMetric) {
                 const cm = inches * 2.54;
-                return Math.round(cm * 100) / 100 + ' cm'; // Round to 2 decimal places for better accuracy
+                // Round to 1 decimal place for better readability and accuracy
+                return Math.round(cm * 10) / 10 + ' cm';
             } else {
                 return formatInches(inches);
             }
@@ -1314,7 +1318,7 @@
             
             // Responsive font size for mobile
             const fontSize = window.innerWidth <= 768 ? 18 : 22;
-            ctx.font = `bold ${fontSize}px "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+            ctx.font = `bold ${fontSize}px "Nunito", "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
             ctx.fillStyle = '#2c3e50';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -1394,7 +1398,7 @@
                 
                 // Draw labels
                 ctx.fillStyle = '#8b5cf6';
-                ctx.font = 'bold 12px "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.font = 'bold 12px "Nunito", "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 
